@@ -29,7 +29,16 @@ async function createQRCode() {
     
     generateBtn.disabled = true;
     generateBtn.textContent = 'Generating...';
-    
+
+    // guard: QRCode lib must be loaded
+    if (typeof QRCode === 'undefined' || typeof QRCode.toCanvas !== 'function') {
+        console.error('QRCode library not found. Make sure you load the qrcode script before app.js.');
+        alert('QR library missing. See console for details.');
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'Generate QR Code';
+        return;
+    }
+
     try {
         const qrId = generateId();
         
@@ -44,6 +53,14 @@ async function createQRCode() {
         
         const qrUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}q.html?id=${qrId}`;
         const canvas = document.getElementById('qrCanvas');
+
+        if (!canvas) {
+            console.error('qrCanvas element not found.');
+            alert('QR canvas missing in the page.');
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate QR Code';
+            return;
+        }
         
         await QRCode.toCanvas(canvas, qrUrl, {
             width: 300,
@@ -66,13 +83,19 @@ async function createQRCode() {
     } catch (error) {
         console.error('Error creating QR code:', error);
         alert('Failed to create QR code. Please try again.');
-        generateBtn.disabled = false;
-        generateBtn.textContent = 'Generate QR Code';
+        if (document.getElementById('generateBtn')) {
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('generateBtn').textContent = 'Generate QR Code';
+        }
     }
 }
 
 function downloadQR(id) {
     const canvas = document.getElementById('qrCanvas');
+    if (!canvas) {
+        alert('No QR to download.');
+        return;
+    }
     const url = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.download = `qr-${id}.png`;
@@ -80,4 +103,12 @@ function downloadQR(id) {
     link.click();
 }
 
-document.getElementById('generateBtn').addEventListener('click', createQRCode);
+// attach handlers after DOM ready
+window.addEventListener('DOMContentLoaded', () => {
+    const generateBtn = document.getElementById('generateBtn');
+    if (!generateBtn) {
+        console.error('generateBtn not found in DOM.');
+        return;
+    }
+    generateBtn.addEventListener('click', createQRCode);
+});
