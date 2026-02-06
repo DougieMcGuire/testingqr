@@ -45,6 +45,111 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <script type="module" src="app.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBaJXCqGmUaGumvcWNE7w4FOOzTJVDH-yg",
+            authDomain: "polorfriends.firebaseapp.com",
+            projectId: "polorfriends",
+            storageBucket: "polorfriends.firebasestorage.app",
+            messagingSenderId: "328546525972",
+            appId: "1:328546525972:web:a6fe0f0a45b4565a7b1801",
+            measurementId: "G-07B4713DQQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function generateId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let id = '';
+            for (let i = 0; i < 7; i++) {
+                id += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return id;
+        }
+
+        async function createQRCode() {
+            const generateBtn = document.getElementById('generateBtn');
+            const qrResult = document.getElementById('qrResult');
+            
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            
+            try {
+                const qrId = generateId();
+                const qrUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}q.html?id=${qrId}`;
+                const canvas = document.getElementById('qrCanvas');
+                
+                console.log('Generating QR for:', qrUrl);
+                
+                // Generate QR code
+                window.QRCode.toCanvas(canvas, qrUrl, {
+                    width: 300,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }, async function (error) {
+                    if (error) {
+                        console.error('QR generation error:', error);
+                        alert('Failed to generate QR code: ' + error);
+                        generateBtn.disabled = false;
+                        generateBtn.textContent = 'Generate QR Code';
+                        return;
+                    }
+                    
+                    console.log('QR generated successfully');
+                    
+                    // Save to Firebase
+                    try {
+                        await addDoc(collection(db, 'qrcodes'), {
+                            id: qrId,
+                            title: 'New QR Code',
+                            text: 'Content will appear here. Click "Edit Content" to customize.',
+                            imageUrl: '',
+                            createdAt: serverTimestamp(),
+                            updatedAt: serverTimestamp()
+                        });
+                        
+                        console.log('Saved to Firebase');
+                        
+                        // Show result
+                        document.getElementById('qrId').textContent = qrId;
+                        document.getElementById('qrUrl').textContent = qrUrl;
+                        qrResult.classList.remove('hidden');
+                        generateBtn.classList.add('hidden');
+                        
+                        document.getElementById('downloadBtn').onclick = () => {
+                            const url = canvas.toDataURL('image/png');
+                            const link = document.createElement('a');
+                            link.download = `qr-${qrId}.png`;
+                            link.href = url;
+                            link.click();
+                        };
+                        document.getElementById('editBtn').onclick = () => window.location.href = `edit.html?id=${qrId}`;
+                        document.getElementById('createAnotherBtn').onclick = () => window.location.reload();
+                        
+                    } catch (firebaseError) {
+                        console.error('Firebase error:', firebaseError);
+                        alert('QR generated but failed to save: ' + firebaseError.message);
+                        generateBtn.disabled = false;
+                        generateBtn.textContent = 'Generate QR Code';
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to create QR code: ' + error.message);
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate QR Code';
+            }
+        }
+
+        document.getElementById('generateBtn').addEventListener('click', createQRCode);
+    </script>
 </body>
 </html>
