@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic QR - Create</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dynamic QR</h1>
+            <nav>
+                <a href="index.html" class="active">Create</a>
+                <a href="dashboard.html">Dashboard</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>Generate QR Code</h2>
+                <p class="subtitle">Create a dynamic QR code that you can update anytime</p>
+                
+                <button id="generateBtn" class="btn-primary">Generate QR Code</button>
+                
+                <div id="qrResult" class="qr-result hidden">
+                    <div class="qr-display">
+                        <canvas id="qrCanvas"></canvas>
+                    </div>
+                    
+                    <div class="qr-info">
+                        <p><strong>QR Code ID:</strong> <span id="qrId"></span></p>
+                        <p class="qr-url"><strong>URL:</strong> <span id="qrUrl"></span></p>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="downloadBtn" class="btn-secondary">Download QR</button>
+                        <button id="editBtn" class="btn-secondary">Edit Content</button>
+                    </div>
+                    
+                    <button id="createAnotherBtn" class="btn-text">Create Another</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

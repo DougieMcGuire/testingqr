@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Content</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="public-page">
+    <div class="container">
+        <div id="loading" class="loading">Loading...</div>
+        
+        <div id="content" class="public-content hidden">
+            <div class="public-card">
+                <h1 id="publicTitle"></h1>
+                <div id="publicImage" class="public-image"></div>
+                <div id="publicText" class="public-text"></div>
+            </div>
+        </div>
+        
+        <div id="error" class="error-state hidden">
+            <h2>QR Code Not Found</h2>
+            <p>This QR code doesn't exist or hasn't been set up yet.</p>
+        </div>
+    </div>
+
+    <script type="module" src="q.js"></script>
+</body>
+</html>
